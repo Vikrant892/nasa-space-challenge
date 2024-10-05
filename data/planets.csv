@@ -1,0 +1,17 @@
+name,type,latitude,longitude,velocity,temperature,diameter_km,distance_from_sun_au,orbital_period_days,description
+Mercury,planet,0.034,48.331,47.87,167,4879,0.387,87.97,Closest to the Sun
+Venus,planet,-3.394,76.680,35.02,464,12104,0.723,224.70,Hottest planet
+Earth,planet,0.0,0.0,29.78,15,12756,1.000,365.25,Our home
+Mars,planet,1.850,49.558,24.07,-65,6792,1.524,687.00,The Red Planet
+Jupiter,planet,1.303,100.464,13.07,-110,142984,5.203,4331.00,Largest planet
+Saturn,planet,2.485,113.665,9.68,-140,120536,9.537,10747.00,The Ringed Planet
+Uranus,planet,0.773,74.006,6.80,-195,51118,19.191,30589.00,The Ice Giant
+Neptune,planet,1.770,131.784,5.43,-200,49528,30.069,59800.00,The Windy Planet
+Pluto,dwarf_planet,17.160,110.299,4.67,-230,2376,39.482,90560.00,Still a planet in our hearts
+Europa,moon,-0.100,36.022,13.74,-160,3121,5.203,3.551,Jupiters icy moon
+Titan,moon,0.300,28.060,5.57,-179,5150,9.537,15.945,Saturns largest moon
+Io,moon,0.040,43.977,17.33,110,3643,5.203,1.769,Most volcanic body
+Ganymede,moon,0.200,63.552,10.88,-163,5262,5.203,7.155,Largest moon in solar system
+Callisto,moon,0.190,298.848,8.20,-139,4821,5.203,16.689,Heavily cratered moon
+Enceladus,moon,-0.010,211.923,12.63,-198,504,9.537,1.370,Has water geysers
+Triton,moon,-157.340,354.763,4.39,-235,2707,30.069,5.877,Neptunes largest moon
