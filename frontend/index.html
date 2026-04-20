@@ -3,143 +3,263 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>VS-SONIFY-01 — Planetary Data Sonification</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>AstroSonify — Planetary Data Sonification</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{background:#0c1020;color:#cfd6e0;font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
-a{color:#5da9e0;text-decoration:none}a:hover{text-decoration:underline}
-.page{max-width:860px;margin:0 auto;padding:30px 24px 60px}
-.banner{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:#7d8a99;border-top:1px solid #2a3650;border-bottom:1px solid #2a3650;padding:8px 0;margin-bottom:26px;text-transform:uppercase;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
-.banner b{color:#cfd6e0;font-weight:500}
-h1{font-family:'IBM Plex Serif',serif;font-size:34px;font-weight:600;color:#fff;letter-spacing:-.01em;line-height:1.15;margin:6px 0 8px}
-.subtitle{color:#7d8a99;font-size:15px;font-style:italic;margin-bottom:22px}
-h2{font-family:'IBM Plex Serif',serif;font-size:20px;color:#fff;margin:32px 0 10px;padding-bottom:5px;border-bottom:1px solid #2a3650;font-weight:600}
-h2 .n{font-family:'IBM Plex Mono',monospace;color:#5da9e0;font-size:13px;margin-right:10px;font-weight:400}
-p{margin-bottom:10px;max-width:720px}
-.datatable{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:transparent;border:1px solid #2a3650;padding:14px 18px;overflow-x:auto;margin:12px 0;line-height:1.7}
-.datatable .rule{color:#2a3650;letter-spacing:-1px}
-.datatable table{width:100%;border-collapse:collapse}
-.datatable th{text-align:left;padding:4px 14px 4px 0;color:#cfd6e0;font-weight:600;border-bottom:1px solid #2a3650;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
-.datatable td{padding:2px 14px 2px 0;color:#cfd6e0;font-variant-numeric:tabular-nums}
-.datatable td.num{text-align:right}
-.datatable tr:hover td{color:#fff}
-.pbtn{background:transparent;border:1px solid #5da9e0;color:#5da9e0;font:inherit;font-family:'IBM Plex Mono',monospace;padding:1px 8px;cursor:pointer;border-radius:0;font-size:12px}
-.pbtn:hover{background:#5da9e0;color:#0c1020}
-.formula{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#cfd6e0;background:transparent;border-left:2px solid #5da9e0;padding:8px 14px;margin:8px 0;line-height:1.6;white-space:pre-wrap}
-.formula b{color:#5da9e0;font-weight:400}
-.scanwrap{margin:14px 0}
-.scanner{border:1px solid #2a3650;padding:10px;display:inline-block;background:transparent}
-canvas{display:block;background:#15212f}
-.log{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7d8a99;background:transparent;border:1px solid #2a3650;margin-top:10px;padding:8px 14px;max-height:180px;overflow:auto;line-height:1.6}
-.log .hit{color:#cfd6e0}
-.spec{display:grid;grid-template-columns:180px 1fr;gap:4px 20px;margin:8px 0;font-family:'IBM Plex Mono',monospace;font-size:12.5px}
-.spec .k{color:#7d8a99}
-.spec .v{color:#cfd6e0}
-.award{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#7bb274;margin:20px 0 8px;letter-spacing:.04em}
-hr.h{border:0;border-top:1px solid #2a3650;margin:18px 0}
-footer{margin-top:40px;padding-top:16px;border-top:1px solid #2a3650;color:#7d8a99;font-size:11.5px;font-family:'IBM Plex Mono',monospace;line-height:1.7}
-footer a{color:#cfd6e0}
-@media(max-width:600px){.spec{grid-template-columns:1fr}h1{font-size:26px}}
+:root{
+  --bg:#0b0620; --panel:#140a2e; --panel2:#1f123f; --line:#2c1e4f;
+  --ink:#f0ecff; --dim:#9a90b5;
+  --yellow:#ffd93d;
+  --teal:#4ecdc4;
+  --magenta:#ff6b9d;
+  --violet:#9d7cff;
+}
+html,body{background:var(--bg);color:var(--ink);font-family:'Bricolage Grotesque',system-ui,sans-serif;font-size:15px;line-height:1.55;min-height:100vh;overflow-x:hidden}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 3s infinite}
+@keyframes twinkle{0%,100%{opacity:.8}50%{opacity:.2}}
+.wrap{max-width:1200px;margin:0 auto;padding:30px 26px 60px;position:relative;z-index:1}
+
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+.brand{display:flex;gap:14px;align-items:center}
+.bm{width:44px;height:44px;background:var(--violet);border-radius:50%;position:relative;box-shadow:0 0 0 3px var(--bg),0 0 0 4px var(--violet)}
+.bm::before{content:'';position:absolute;inset:8px;background:var(--yellow);border-radius:50%}
+.brand h1{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.brand small{display:block;color:var(--dim);font-size:12px;font-family:'JetBrains Mono',monospace;margin-top:-2px}
+.medal{display:flex;gap:10px;align-items:center;padding:8px 14px;background:linear-gradient(0deg,var(--yellow),var(--yellow));background:var(--yellow);color:var(--bg);border-radius:100px;font-weight:700;font-size:12.5px;border:2px solid var(--bg);box-shadow:0 0 0 2px var(--yellow)}
+.medal::before{content:'★';font-size:16px}
+
+.hero{display:grid;grid-template-columns:1.3fr 1fr;gap:30px;margin-bottom:40px;align-items:center}
+.hero h2{font-size:48px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-bottom:16px}
+.hero h2 .y{color:var(--yellow)}
+.hero h2 .t{color:var(--teal)}
+.hero h2 .m{color:var(--magenta)}
+.hero p{color:var(--dim);font-size:16px;max-width:520px;margin-bottom:24px}
+.herobadge{display:flex;gap:10px;align-items:center;padding:8px 14px;background:var(--panel);border:1px solid var(--line);border-radius:100px;font-size:12px;color:var(--dim);font-family:'JetBrains Mono',monospace;width:fit-content}
+.herobadge b{color:var(--yellow);font-weight:700}
+
+.herovis{position:relative;height:280px}
+.orbit{position:absolute;left:50%;top:50%;border:1px solid var(--line);border-radius:50%;transform:translate(-50%,-50%)}
+.orbit.o1{width:260px;height:260px}
+.orbit.o2{width:180px;height:180px}
+.orbit.o3{width:100px;height:100px}
+.sun{position:absolute;left:50%;top:50%;width:40px;height:40px;background:var(--yellow);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 40px var(--yellow),0 0 80px var(--yellow)}
+.planet{position:absolute;border-radius:50%}
+.p1{width:14px;height:14px;background:var(--teal);top:calc(50% - 90px - 7px);left:50%;margin-left:-7px;animation:orb1 12s linear infinite;transform-origin:7px 97px}
+.p2{width:20px;height:20px;background:var(--magenta);top:calc(50% - 50px - 10px);left:50%;margin-left:-10px;animation:orb2 8s linear infinite;transform-origin:10px 60px}
+.p3{width:10px;height:10px;background:var(--violet);top:calc(50% - 130px - 5px);left:50%;margin-left:-5px;animation:orb3 18s linear infinite;transform-origin:5px 135px}
+@keyframes orb1{to{transform:rotate(360deg)}}
+@keyframes orb2{to{transform:rotate(-360deg)}}
+@keyframes orb3{to{transform:rotate(360deg)}}
+
+/* Planet grid */
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px}
+.section-head h3{font-size:24px;font-weight:700;letter-spacing:-.02em}
+.section-head h3 .n{color:var(--violet);font-family:'JetBrains Mono',monospace;font-size:13px;margin-right:10px;font-weight:500;vertical-align:middle}
+.section-head p{color:var(--dim);font-size:14px;margin-top:4px;font-weight:400}
+
+.planets{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:40px}
+.pl{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;cursor:pointer;transition:border-color .15s,transform .15s;text-align:center;position:relative;overflow:hidden}
+.pl:hover{border-color:var(--violet);transform:translateY(-3px)}
+.pl.playing{border-color:var(--yellow);box-shadow:0 0 0 2px var(--yellow)}
+.pl .orb{width:60px;height:60px;border-radius:50%;margin:0 auto 14px;position:relative}
+.pl h4{font-size:16px;font-weight:700;margin-bottom:8px}
+.pl .specs{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--dim);text-align:left}
+.pl .specs b{color:var(--ink);display:block;font-weight:500}
+.pl .play{position:absolute;top:14px;right:14px;width:26px;height:26px;background:var(--bg);border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:9px}
+.pl:hover .play,.pl.playing .play{background:var(--violet);color:var(--bg);border-color:var(--violet)}
+
+/* Keyboard */
+.kb{display:flex;justify-content:center;margin:22px 0 14px;height:110px;position:relative}
+.kb .k{width:32px;height:100%;background:var(--panel);border:1px solid var(--line);margin-right:-1px;border-radius:0 0 4px 4px;position:relative;transition:background .1s}
+.kb .k.bk{width:22px;height:66%;background:#2a1f4d;margin:0 -11px;z-index:2;border-radius:0 0 3px 3px;border:1px solid #1a0f33}
+.kb .k.active{background:var(--yellow);border-color:var(--yellow)}
+.kb .k.bk.active{background:var(--magenta);border-color:var(--magenta)}
+
+/* Image sonifier */
+.sonpanel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:24px}
+.sontwo{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:flex-start}
+.sontwo h3{font-size:18px;font-weight:700;margin-bottom:6px}
+.sontwo .ps{color:var(--dim);font-size:13px;margin-bottom:14px}
+.canvasbox{border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg)}
+canvas{display:block;width:100%;height:auto;border-radius:6px}
+.btns{margin-top:14px;display:flex;gap:10px}
+.btn{padding:10px 18px;background:var(--violet);color:var(--ink);border:none;font:inherit;font-weight:600;cursor:pointer;border-radius:8px;font-size:13px}
+.btn:hover{background:var(--magenta)}
+.btn.g{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.g:hover{background:var(--panel2);border-color:var(--violet)}
+
+.controls label{display:block;font-size:11.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin:14px 0 6px;font-weight:600}
+.controls label span{float:right;color:var(--yellow);font-family:'JetBrains Mono',monospace;font-weight:500}
+.controls input[type=range]{width:100%;height:4px;appearance:none;background:var(--line);border-radius:2px;outline:none}
+.controls input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;background:var(--yellow);border-radius:50%;cursor:pointer}
+.controls select{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:8px 10px;font:inherit;border-radius:7px;font-size:13px}
+
+.scanlog{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--dim);line-height:1.7;max-height:120px;overflow:auto;margin-top:12px}
+.scanlog .h{color:var(--teal)}
+
+/* formulas */
+.formulas{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:20px;margin-top:20px}
+.formulas pre{font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.8;color:var(--dim);white-space:pre-wrap}
+.formulas pre b{color:var(--yellow);font-weight:600}
+
+.foot{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.foot a{color:var(--ink)}
+
+@media(max-width:900px){.hero{grid-template-columns:1fr}.hero h2{font-size:36px}.sontwo{grid-template-columns:1fr}.herovis{height:220px}}
 </style>
 </head>
 <body>
-<div class="page">
+<div class="stars" id="stars"></div>
+<div class="wrap">
 
-<div class="banner">
-<span>NASA SPACE APPS CHALLENGE 2023 &middot; <b>GALACTIC PROBLEM SOLVER</b></span>
-<span>DOC-ID VS-SONIFY-01 &middot; prepared V.SHARMA &middot; OPEN</span>
+<header class="top">
+  <div class="brand"><div class="bm"></div><div><h1>AstroSonify</h1><small>vs-sonify-01 · planetary sonification</small></div></div>
+  <div class="medal">NASA Space Apps 2023 Winner</div>
+</header>
+
+<section class="hero">
+  <div>
+    <h2>Hear the <span class="y">sun</span>.<br>Play the <span class="t">planets</span>.<br>Sing the <span class="m">stars</span>.</h2>
+    <p>Physical parameters of solar system bodies — temperature, diameter, orbital velocity — mapped to audible sine waves with ADSR envelopes. Originally built for NASA Space Apps Challenge Adelaide 2023.</p>
+    <div class="herobadge">Source: <b>NASA Planetary Factsheet</b> · <b>JPL Horizons</b></div>
+  </div>
+  <div class="herovis">
+    <div class="orbit o1"></div><div class="orbit o2"></div><div class="orbit o3"></div>
+    <div class="sun"></div>
+    <div class="planet p1"></div>
+    <div class="planet p2"></div>
+    <div class="planet p3"></div>
+  </div>
+</section>
+
+<div class="section-head">
+  <div><h3><span class="n">§1</span>Celestial Bodies</h3><p>Click any body to sonify its parameters</p></div>
 </div>
 
-<h1>Planetary Data Sonification</h1>
-<div class="subtitle">Mapping physical parameters of solar-system bodies to audible signals.</div>
+<section class="planets" id="planetgrid"></section>
 
-<p>This project converts numerical properties of planets and moons — surface temperature, diameter, and orbital velocity — into audio signals. Originally prototyped for NASA Space Apps Challenge 2023 (Adelaide), where it was selected as a Galactic Problem Solver. Python + Streamlit for the reference implementation; this page implements the same formulas directly in the Web Audio API so you can hear each body in-browser.</p>
+<div class="kb" id="keyboard"></div>
 
-<h2><span class="n">§1</span>Dataset &amp; Play-Back</h2>
-<div class="datatable">
-<table>
-<thead><tr><th>Body</th><th class="num">Diameter (km)</th><th class="num">Mass (10²⁴ kg)</th><th class="num">T_mean (K)</th><th class="num">V_orb (km/s)</th><th>Play</th></tr></thead>
-<tbody id="tbl"></tbody>
-</table>
-</div>
-<p style="font-size:12px;color:#7d8a99">Source: NASA planetary factsheet / JPL Horizons (public).</p>
-
-<h2><span class="n">§2</span>Sonification Mapping</h2>
-<p>Each body is rendered as a single sine-wave pitch with an ADSR envelope. Pitch scales with temperature, duration with diameter, and amplitude with orbital velocity.</p>
-<div class="formula">PITCH       <b>f</b>  = 220 &times; 2<sup>((T − 270) / 50)</sup>   Hz
-
-DURATION    <b>d</b>  = 0.4 + 2.0 &times; log₁₀(D / 3000)  seconds
-
-AMPLITUDE   <b>a</b>  = 0.20 + 0.60 &times; (V / 50)
-
-WAVEFORM     sin(2πft) &times; ADSR envelope
-             attack 0.02s &middot; decay 0.10s &middot; sustain 0.7 &middot; release 0.3s</div>
-
-<h2><span class="n">§3</span>Image-to-Music Mapping</h2>
-<p>An image is divided into a grid; each cell's average luminance is mapped to the nearest note in a pentatonic scale (C, D, E, G, A). Playback proceeds left-to-right, top-to-bottom at a configurable tempo. Below: a 16×8 starfield rendered to canvas, sonified on demand.</p>
-<div class="scanwrap">
-<div class="scanner"><canvas id="cv" width="320" height="160"></canvas></div>
-<div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12.5px"><button class="pbtn" onclick="sonifyImage()">[ SONIFY IMAGE ]</button><button class="pbtn" onclick="drawStars()" style="border-color:#7d8a99;color:#7d8a99">[ regenerate ]</button><span style="color:#7d8a99">tempo <b id="bpmv" style="color:#cfd6e0">180</b> bpm &middot; scale C pentatonic</span></div>
-</div>
-<div class="log" id="slog">click <b style="color:#cfd6e0">SONIFY IMAGE</b> to begin.</div>
-
-<h2><span class="n">§4</span>Technical Specification</h2>
-<div class="spec">
-<span class="k">Runtime</span><span class="v">Python 3.11 + Streamlit 1.28</span>
-<span class="k">Audio (web demo)</span><span class="v">Web Audio API (in-browser preview)</span>
-<span class="k">Sample rate</span><span class="v">44100 Hz</span>
-<span class="k">Data source</span><span class="v">NASA planetary factsheet (public)</span>
-<span class="k">Scale system</span><span class="v">Pentatonic — C₄, D₄, E₄, G₄, A₄</span>
-<span class="k">Image processing</span><span class="v">Pillow (PIL) 8-bit luminance extraction</span>
-<span class="k">Output formats</span><span class="v">WAV (offline) &middot; AudioContext (web)</span>
+<div class="section-head">
+  <div><h3><span class="n">§2</span>Image Sonifier</h3><p>Scan a starfield left-to-right, each cell plays a pentatonic note</p></div>
 </div>
 
-<h2><span class="n">§5</span>Recognition</h2>
-<div class="award">2023 &middot; NASA Space Apps Challenge Adelaide &middot; Galactic Problem Solver</div>
+<section class="sonpanel">
+  <div class="sontwo">
+    <div>
+      <div class="canvasbox"><canvas id="cv" width="420" height="220"></canvas></div>
+      <div class="scanlog" id="slog">Click <b style="color:var(--ink)">Sonify Image</b> to scan the starfield left-to-right.</div>
+    </div>
+    <div class="controls">
+      <h3>Scanner Controls</h3>
+      <div class="ps">8 × 4 grid · luminance → pentatonic scale</div>
+      <label>Tempo <span id="bpmL">180 bpm</span></label>
+      <input type="range" id="bpm" min="60" max="320" value="180">
+      <label>Scale</label>
+      <select id="scale"><option value="penta">Pentatonic (C D E G A)</option><option value="major">Major (C D E F G A B)</option><option value="minor">Natural minor</option><option value="chrom">Chromatic</option></select>
+      <label>Pitch octave <span id="octL">4</span></label>
+      <input type="range" id="oct" min="2" max="6" value="4">
+      <div class="btns">
+        <button class="btn" onclick="sonifyImage()">▶ Sonify Image</button>
+        <button class="btn g" onclick="drawStars()">Regenerate</button>
+      </div>
+    </div>
+  </div>
+</section>
 
-<footer>
-Source: <a href="https://github.com/Vikrant892/nasa-space-challenge">github.com/Vikrant892/nasa-space-challenge</a> &middot; MIT<br>
-V. Sharma &middot; Adelaide &middot; 2023
+<div class="formulas">
+  <pre><b>Pitch</b>       f  = 220 × 2^((T_mean − 270) / 50)   Hz
+<b>Duration</b>    d  = 0.4 + 2.0 × log₁₀(D / 3000)     seconds
+<b>Amplitude</b>   a  = 0.20 + 0.60 × (V_orb / 50)
+<b>Envelope</b>    ADSR · A 0.02s · D 0.10s · S 0.7 · R 0.3s</pre>
+</div>
+
+<footer class="foot">
+  <span>AstroSonify · Vikrant Sharma · 2023–2025</span>
+  <span><a href="https://github.com/Vikrant892/nasa-space-challenge">github.com/Vikrant892/nasa-space-challenge</a></span>
 </footer>
 </div>
 
 <script>
-const BODIES=[
- ['Mercury',4879,0.330,440,47.9],
- ['Venus',12104,4.87,737,35.0],
- ['Earth',12756,5.97,288,29.8],
- ['Mars',6792,0.642,210,24.1],
- ['Jupiter',142984,1898,165,13.1],
- ['Saturn',120536,568,134,9.7],
- ['Uranus',51118,86.8,76,6.8],
- ['Neptune',49528,102,72,5.4],
- ['Moon',3475,0.073,220,1.0],
- ['Europa',3122,0.048,102,13.7],
- ['Titan',5149,0.135,94,5.6],
-];
-const tbl=document.getElementById('tbl');
-BODIES.forEach((b,i)=>{tbl.innerHTML+='<tr><td>'+b[0]+'</td><td class="num">'+b[1].toLocaleString()+'</td><td class="num">'+b[2]+'</td><td class="num">'+b[3]+'</td><td class="num">'+b[4]+'</td><td><button class="pbtn" onclick="play('+i+')">▶</button></td></tr>'});
-let ac=null;function ctx(){return ac||(ac=new (window.AudioContext||window.webkitAudioContext)())}
-function envelope(g,a,d,s,r,dur){const now=ctx().currentTime;g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(1,now+a);g.gain.linearRampToValueAtTime(s,now+a+d);g.gain.setValueAtTime(s,now+dur-r);g.gain.linearRampToValueAtTime(0,now+dur)}
-function play(i){const b=BODIES[i];const f=220*Math.pow(2,(b[3]-270)/50);const d=0.4+2.0*Math.log10(b[1]/3000);const a=Math.min(0.9,0.2+0.6*(b[4]/50));const c=ctx();const osc=c.createOscillator(),g=c.createGain();osc.type='sine';osc.frequency.value=Math.max(40,Math.min(3000,f));const gg=c.createGain();gg.gain.value=a;osc.connect(g);g.connect(gg);gg.connect(c.destination);envelope(g,0.02,0.1,0.7,0.3,d);osc.start();osc.stop(c.currentTime+d)}
+// stars
+const starsEl=document.getElementById('stars');
+for(let i=0;i<80;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*1.6+0.4;s.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;animation-delay:'+Math.random()*3+'s';starsEl.appendChild(s)}
 
-const cv=document.getElementById('cv'),g=cv.getContext('2d');
-function drawStars(){g.fillStyle='#0c1020';g.fillRect(0,0,320,160);for(let i=0;i<120;i++){const x=Math.random()*320,y=Math.random()*160,r=Math.random()*1.4+0.3,l=Math.floor(120+Math.random()*135);g.fillStyle='rgb('+l+','+l+','+l+')';g.beginPath();g.arc(x,y,r,0,Math.PI*2);g.fill()}const GW=16,GH=8,CW=320/GW,CH=160/GH;g.strokeStyle='rgba(125,138,153,0.15)';for(let i=1;i<GW;i++){g.beginPath();g.moveTo(i*CW,0);g.lineTo(i*CW,160);g.stroke()}for(let j=1;j<GH;j++){g.beginPath();g.moveTo(0,j*CH);g.lineTo(320,j*CH);g.stroke()}}
-drawStars();
-async function sonifyImage(){const c=ctx();const GW=16,GH=8,CW=320/GW,CH=160/GH;const notes=[261.63,293.66,329.63,392.00,440.00];const log=document.getElementById('slog');log.innerHTML='';
- for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){
-  const px=g.getImageData(i*CW+CW/2,j*CH+CH/2,Math.ceil(CW),Math.ceil(CH)).data;let lum=0;for(let k=0;k<px.length;k+=4)lum+=0.299*px[k]+0.587*px[k+1]+0.114*px[k+2];lum/=(px.length/4);const n=Math.min(4,Math.floor(lum/255*4.999));const f=notes[n]*(j<4?2:1);
-  const osc=c.createOscillator(),gn=c.createGain();osc.type='sine';osc.frequency.value=f;gn.gain.value=0.0001;const now=c.currentTime;gn.gain.linearRampToValueAtTime(0.12,now+0.005);gn.gain.linearRampToValueAtTime(0,now+0.12);osc.connect(gn);gn.connect(c.destination);osc.start();osc.stop(now+0.13);
-  // outline the current cell
-  g.strokeStyle='#5da9e0';g.lineWidth=1.5;g.strokeRect(i*CW,j*CH,CW,CH);
-  log.innerHTML+='<div class="hit">[cell '+i+','+j+']  L='+(lum/255).toFixed(2)+'  →  f='+f.toFixed(0)+' Hz</div>';log.scrollTop=log.scrollHeight;
-  await new Promise(r=>setTimeout(r,60));
-  // redraw cell plain
-  g.clearRect(i*CW,j*CH,CW,CH);const pxd=g.createImageData(CW,CH);drawStars();
- }
- log.innerHTML+='<div style="color:#7bb274">scan complete.</div>';
+// planets data (diameter km, mass 1e24, mean K, v_orb km/s, color1, color2)
+const BODIES=[
+  {n:'Mercury',d:4879,m:0.33,t:440,v:47.9,c1:'#8a7f6b',c2:'#c4b59c'},
+  {n:'Venus',d:12104,m:4.87,t:737,v:35.0,c1:'#c98c5a',c2:'#f2c28e'},
+  {n:'Earth',d:12756,m:5.97,t:288,v:29.8,c1:'#4a90d9',c2:'#75c2a7'},
+  {n:'Mars',d:6792,m:0.642,t:210,v:24.1,c1:'#b5492b',c2:'#d4764e'},
+  {n:'Jupiter',d:142984,m:1898,t:165,v:13.1,c1:'#c89365',c2:'#e8cba0'},
+  {n:'Saturn',d:120536,m:568,t:134,v:9.7,c1:'#d4b47d',c2:'#ead5a8'},
+  {n:'Uranus',d:51118,m:86.8,t:76,v:6.8,c1:'#5fbac4',c2:'#91dbe3'},
+  {n:'Neptune',d:49528,m:102,t:72,v:5.4,c1:'#3a5dcc',c2:'#6284e8'},
+  {n:'Moon',d:3475,m:0.073,t:220,v:1.0,c1:'#8a8a8a',c2:'#bcbcbc'},
+  {n:'Europa',d:3122,m:0.048,t:102,v:13.7,c1:'#c4a578',c2:'#e6cd9c'},
+  {n:'Titan',d:5149,m:0.135,t:94,v:5.6,c1:'#d49a52',c2:'#e8c083'}
+];
+
+function drawOrb(c1,c2){return '<svg viewBox="0 0 60 60" width="60" height="60"><circle cx="30" cy="30" r="28" fill="'+c1+'"/><circle cx="24" cy="22" r="18" fill="'+c2+'"/></svg>'}
+const grid=document.getElementById('planetgrid');
+grid.innerHTML=BODIES.map((b,i)=>'<div class="pl" data-i="'+i+'" onclick="play('+i+',this)"><div class="orb">'+drawOrb(b.c1,b.c2)+'</div><div class="play">▶</div><h4>'+b.n+'</h4><div class="specs"><div><b>'+b.d.toLocaleString()+'</b>diameter km</div><div><b>'+b.m+'</b>mass 10²⁴</div><div><b>'+b.t+' K</b>mean temp</div><div><b>'+b.v+' km/s</b>orbital</div></div></div>').join('');
+
+// keyboard
+const KB=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const kbEl=document.getElementById('keyboard');
+for(let oct=0;oct<2;oct++)for(let i=0;i<12;i++){const k=document.createElement('div');k.className='k'+(KB[i].includes('#')?' bk':'');k.dataset.n=KB[i]+(4+oct);kbEl.appendChild(k)}
+
+let ac=null;function ctx(){return ac||(ac=new (window.AudioContext||window.webkitAudioContext)())}
+function highlight(freq){const A4=440;const n=12*Math.log2(freq/A4)+57;const k=Math.round(n)%12;const el=Array.from(kbEl.children).find(e=>e.dataset.n&&KB.indexOf(e.dataset.n.replace(/\d/,''))===k);if(el){el.classList.add('active');setTimeout(()=>el.classList.remove('active'),250)}}
+
+function play(i,el){
+  const b=BODIES[i];const f=220*Math.pow(2,(b.t-270)/50);const d=0.4+2.0*Math.log10(b.d/3000);const a=Math.min(0.8,0.2+0.6*(b.v/50));
+  const c=ctx();const osc=c.createOscillator(),g=c.createGain();osc.type='sine';osc.frequency.value=Math.max(60,Math.min(2400,f));
+  const now=c.currentTime;g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(a,now+0.02);g.gain.linearRampToValueAtTime(a*0.7,now+0.12);g.gain.setValueAtTime(a*0.7,now+Math.max(0.2,d-0.3));g.gain.linearRampToValueAtTime(0,now+d);
+  osc.connect(g);g.connect(c.destination);osc.start();osc.stop(now+d);
+  highlight(osc.frequency.value);
+  document.querySelectorAll('.pl').forEach(p=>p.classList.remove('playing'));el.classList.add('playing');setTimeout(()=>el.classList.remove('playing'),d*1000);
 }
+
+// canvas starfield
+const cv=document.getElementById('cv'),gctx=cv.getContext('2d');
+function drawStars(){gctx.fillStyle='#0b0620';gctx.fillRect(0,0,420,220);for(let i=0;i<140;i++){const x=Math.random()*420,y=Math.random()*220,r=Math.random()*1.4+0.3,l=Math.floor(140+Math.random()*115);gctx.fillStyle='rgb('+l+','+l+','+l+')';gctx.beginPath();gctx.arc(x,y,r,0,Math.PI*2);gctx.fill()}
+  // nebula tint
+  gctx.globalCompositeOperation='lighter';
+  const pa=gctx.createRadialGradient(120,80,10,120,80,100);pa.addColorStop(0,'rgba(157,124,255,.25)');pa.addColorStop(1,'transparent');gctx.fillStyle=pa;gctx.fillRect(0,0,420,220);
+  const pb=gctx.createRadialGradient(300,150,10,300,150,120);pb.addColorStop(0,'rgba(255,107,157,.18)');pb.addColorStop(1,'transparent');gctx.fillStyle=pb;gctx.fillRect(0,0,420,220);
+  gctx.globalCompositeOperation='source-over';
+  // grid
+  const GW=8,GH=4,CW=420/GW,CH=220/GH;gctx.strokeStyle='rgba(255,255,255,.06)';gctx.lineWidth=1;
+  for(let i=1;i<GW;i++){gctx.beginPath();gctx.moveTo(i*CW,0);gctx.lineTo(i*CW,220);gctx.stroke()}
+  for(let j=1;j<GH;j++){gctx.beginPath();gctx.moveTo(0,j*CH);gctx.lineTo(420,j*CH);gctx.stroke()}
+}
+drawStars();
+
+const SCALES={penta:[0,2,4,7,9],major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],chrom:[0,1,2,3,4,5,6,7,8,9,10,11]};
+async function sonifyImage(){
+  const c=ctx();const GW=8,GH=4,CW=420/GW,CH=220/GH;const bpm=+document.getElementById('bpm').value;const scaleKey=document.getElementById('scale').value;const oct=+document.getElementById('oct').value;
+  const notes=SCALES[scaleKey].map(s=>261.63*Math.pow(2,s/12)*Math.pow(2,oct-4));
+  const step=60/bpm/2;
+  const log=document.getElementById('slog');log.innerHTML='';
+  for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){
+    const px=gctx.getImageData(i*CW,j*CH,CW,CH).data;let lum=0;for(let k=0;k<px.length;k+=4)lum+=(0.299*px[k]+0.587*px[k+1]+0.114*px[k+2])/(px.length/4);
+    const n=Math.min(notes.length-1,Math.floor(lum/255*notes.length*0.999));const f=notes[n]*(j<GH/2?2:1);
+    const osc=c.createOscillator(),gn=c.createGain();osc.type='sine';osc.frequency.value=f;gn.gain.value=0.0001;const now=c.currentTime;gn.gain.linearRampToValueAtTime(0.14,now+0.01);gn.gain.linearRampToValueAtTime(0,now+step*0.9);osc.connect(gn);gn.connect(c.destination);osc.start();osc.stop(now+step);
+    // outline cell
+    gctx.save();gctx.strokeStyle='#ffd93d';gctx.lineWidth=2;gctx.strokeRect(i*CW,j*CH,CW,CH);gctx.restore();
+    highlight(f);
+    log.innerHTML+='<div><span class="h">cell '+i+','+j+'</span>  L='+(lum/255).toFixed(2)+'  →  f='+f.toFixed(0)+' Hz</div>';log.scrollTop=log.scrollHeight;
+    await new Promise(r=>setTimeout(r,step*1000));
+    // redraw cell background
+    drawStars();j!==GH-1||i!==GW-1||0;
+  }
+  log.innerHTML+='<div style="color:var(--teal)">✓ scan complete.</div>';
+}
+document.getElementById('bpm').addEventListener('input',e=>document.getElementById('bpmL').textContent=e.target.value+' bpm');
+document.getElementById('oct').addEventListener('input',e=>document.getElementById('octL').textContent=e.target.value);
 </script>
 </body>
 </html>
