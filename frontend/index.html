@@ -1,382 +1,144 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AstroSonify - Planetary Data Sonification</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VS-SONIFY-01 — Planetary Data Sonification</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#000;--card:rgba(28,28,30,.8);--border:rgba(255,255,255,.08);--text:#f5f5f7;--sec:#86868b;--accent:#2997ff;--green:#30d158;--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased}
-a{color:var(--accent);text-decoration:none;transition:opacity .3s ease}
-a:hover{opacity:.8}
-
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(0,0,0,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border);padding:0 clamp(1rem,5vw,4rem);height:52px;display:flex;align-items:center;justify-content:space-between}
-.nav-brand{font-size:1.1rem;font-weight:600;letter-spacing:-.02em}
-.nav-right{display:flex;gap:1.5rem;align-items:center;font-size:.875rem}
-
-.hero{padding:8rem 0 4rem;text-align:center}
-.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:700;letter-spacing:-.04em;line-height:1.08}
-.hero h1 span{color:var(--accent)}
-.hero p{color:var(--sec);font-size:clamp(1rem,2vw,1.35rem);margin-top:.75rem;max-width:540px;margin-inline:auto}
-
-.award{display:inline-flex;align-items:center;gap:.75rem;background:linear-gradient(135deg,rgba(255,214,10,.12),rgba(255,159,10,.08));border:1px solid rgba(255,214,10,.25);border-radius:100px;padding:.6rem 1.5rem;margin-top:2rem;font-size:.875rem;font-weight:600;color:#ffd60a}
-.award::before{content:'';display:block;width:10px;height:10px;border-radius:50%;background:#ffd60a;box-shadow:0 0 8px rgba(255,214,10,.6)}
-
-.container{max-width:1120px;margin:0 auto;padding:0 clamp(1rem,5vw,4rem)}
-section{padding:4rem 0}
-.label{font-size:.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:.5rem}
-.title{font-size:clamp(1.75rem,3.5vw,2.75rem);font-weight:700;letter-spacing:-.03em}
-.subtitle{color:var(--sec);font-size:1rem;margin-top:.5rem;max-width:540px}
-.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.75rem;border-radius:100px;font-size:.9375rem;font-weight:500;border:none;cursor:pointer;transition:all .3s ease;font-family:var(--font)}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:#0077ed}
-.btn-sm{padding:.5rem 1.25rem;font-size:.8125rem}
-
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem;margin-top:2.5rem}
-.stat{background:var(--card);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:1.5rem;text-align:center}
-.stat-val{font-size:2rem;font-weight:700;letter-spacing:-.03em}
-.stat-lbl{font-size:.8125rem;color:var(--sec);margin-top:.25rem}
-
-/* Planet Grid */
-.planet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1.25rem;margin-top:2rem}
-.planet-card{background:var(--card);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:1.5rem;text-align:center;cursor:pointer;transition:all .3s ease;position:relative;overflow:hidden}
-.planet-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-.planet-card.active{border-color:var(--accent);box-shadow:0 0 30px rgba(41,151,255,.15)}
-.planet-orb{width:72px;height:72px;border-radius:50%;margin:0 auto 1rem;position:relative}
-.planet-card h3{font-size:.9375rem;font-weight:600;margin-bottom:.5rem}
-.planet-data{font-size:.6875rem;color:var(--sec);line-height:1.6}
-.planet-card .play-hint{position:absolute;top:.75rem;right:.75rem;width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s ease}
-.planet-card .play-hint::after{content:'';border-left:7px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent;margin-left:2px}
-.planet-card:hover .play-hint{opacity:1}
-
-/* Composer */
-.composer{background:var(--card);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:2rem;margin-top:2rem}
-.composer-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem;margin-top:1.25rem}
-.fg{display:flex;flex-direction:column;gap:.375rem}
-.fg label{font-size:.8125rem;color:var(--sec);font-weight:500}
-.fg input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.1);outline:none}
-.fg input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer}
-.fg select{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-size:.9375rem;font-family:var(--font);outline:none}
-.fg select option{background:#1c1c1e}
-.range-val{font-size:.75rem;color:var(--accent);font-weight:600}
-
-/* Piano */
-.piano-wrap{margin-top:2rem;overflow-x:auto;padding-bottom:1rem}
-.piano{display:flex;position:relative;height:140px;min-width:600px}
-.white-key{flex:1;min-width:36px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:0 0 8px 8px;position:relative;z-index:1;transition:background .15s ease}
-.white-key.active{background:var(--accent)}
-.white-key span{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:.6rem;color:var(--sec)}
-.black-key{width:24px;height:85px;background:rgba(0,0,0,.9);border:1px solid rgba(255,255,255,.12);border-radius:0 0 5px 5px;position:absolute;z-index:2;margin-left:-12px;transition:background .15s ease}
-.black-key.active{background:var(--accent)}
-
-/* Scanner */
-.scanner-area{margin-top:2rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
-@media(max-width:700px){.scanner-area{grid-template-columns:1fr}}
-.canvas-box{background:var(--card);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:1.5rem;text-align:center}
-.canvas-box canvas{width:100%;border-radius:12px;cursor:pointer}
-.scan-info{background:var(--card);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:1.5rem}
-.scan-log{font-family:'SF Mono',SFMono-Regular,Consolas,monospace;font-size:.75rem;color:var(--sec);line-height:1.8;max-height:200px;overflow-y:auto}
-.scan-log .note-line{color:var(--accent)}
-
-.pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem}
-.pill{padding:.4rem 1rem;border-radius:100px;font-size:.75rem;font-weight:500;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--sec)}
-footer{border-top:1px solid var(--border);padding:2.5rem 0;text-align:center;color:var(--sec);font-size:.8125rem;margin-top:4rem}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#0c1020;color:#cfd6e0;font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.6;min-height:100vh}
+a{color:#5da9e0;text-decoration:none}a:hover{text-decoration:underline}
+.page{max-width:860px;margin:0 auto;padding:30px 24px 60px}
+.banner{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;color:#7d8a99;border-top:1px solid #2a3650;border-bottom:1px solid #2a3650;padding:8px 0;margin-bottom:26px;text-transform:uppercase;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.banner b{color:#cfd6e0;font-weight:500}
+h1{font-family:'IBM Plex Serif',serif;font-size:34px;font-weight:600;color:#fff;letter-spacing:-.01em;line-height:1.15;margin:6px 0 8px}
+.subtitle{color:#7d8a99;font-size:15px;font-style:italic;margin-bottom:22px}
+h2{font-family:'IBM Plex Serif',serif;font-size:20px;color:#fff;margin:32px 0 10px;padding-bottom:5px;border-bottom:1px solid #2a3650;font-weight:600}
+h2 .n{font-family:'IBM Plex Mono',monospace;color:#5da9e0;font-size:13px;margin-right:10px;font-weight:400}
+p{margin-bottom:10px;max-width:720px}
+.datatable{font-family:'IBM Plex Mono',monospace;font-size:12.5px;background:transparent;border:1px solid #2a3650;padding:14px 18px;overflow-x:auto;margin:12px 0;line-height:1.7}
+.datatable .rule{color:#2a3650;letter-spacing:-1px}
+.datatable table{width:100%;border-collapse:collapse}
+.datatable th{text-align:left;padding:4px 14px 4px 0;color:#cfd6e0;font-weight:600;border-bottom:1px solid #2a3650;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+.datatable td{padding:2px 14px 2px 0;color:#cfd6e0;font-variant-numeric:tabular-nums}
+.datatable td.num{text-align:right}
+.datatable tr:hover td{color:#fff}
+.pbtn{background:transparent;border:1px solid #5da9e0;color:#5da9e0;font:inherit;font-family:'IBM Plex Mono',monospace;padding:1px 8px;cursor:pointer;border-radius:0;font-size:12px}
+.pbtn:hover{background:#5da9e0;color:#0c1020}
+.formula{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#cfd6e0;background:transparent;border-left:2px solid #5da9e0;padding:8px 14px;margin:8px 0;line-height:1.6;white-space:pre-wrap}
+.formula b{color:#5da9e0;font-weight:400}
+.scanwrap{margin:14px 0}
+.scanner{border:1px solid #2a3650;padding:10px;display:inline-block;background:transparent}
+canvas{display:block;background:#15212f}
+.log{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7d8a99;background:transparent;border:1px solid #2a3650;margin-top:10px;padding:8px 14px;max-height:180px;overflow:auto;line-height:1.6}
+.log .hit{color:#cfd6e0}
+.spec{display:grid;grid-template-columns:180px 1fr;gap:4px 20px;margin:8px 0;font-family:'IBM Plex Mono',monospace;font-size:12.5px}
+.spec .k{color:#7d8a99}
+.spec .v{color:#cfd6e0}
+.award{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#7bb274;margin:20px 0 8px;letter-spacing:.04em}
+hr.h{border:0;border-top:1px solid #2a3650;margin:18px 0}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid #2a3650;color:#7d8a99;font-size:11.5px;font-family:'IBM Plex Mono',monospace;line-height:1.7}
+footer a{color:#cfd6e0}
+@media(max-width:600px){.spec{grid-template-columns:1fr}h1{font-size:26px}}
 </style>
 </head>
 <body>
+<div class="page">
 
-<nav>
-  <div class="nav-brand">AstroSonify</div>
-  <div class="nav-right">
-    <a href="#sonify">Sonify</a>
-    <a href="#scanner">Scanner</a>
-    <a href="https://github.com/Vikrant892/nasa-space-challenge" target="_blank" rel="noopener">GitHub</a>
-  </div>
-</nav>
+<div class="banner">
+<span>NASA SPACE APPS CHALLENGE 2023 &middot; <b>GALACTIC PROBLEM SOLVER</b></span>
+<span>DOC-ID VS-SONIFY-01 &middot; prepared V.SHARMA &middot; OPEN</span>
+</div>
 
-<header class="hero">
-  <div class="container">
-    <h1>Astro<span>Sonify</span></h1>
-    <p>Planetary Data Sonification</p>
-    <div class="award">NASA Space Apps Challenge Winner</div>
-  </div>
-</header>
+<h1>Planetary Data Sonification</h1>
+<div class="subtitle">Mapping physical parameters of solar-system bodies to audible signals.</div>
 
-<section>
-  <div class="container">
-    <div class="label">Impact</div>
-    <div class="title">Exploration in Numbers</div>
-    <div class="stats">
-      <div class="stat"><div class="stat-val">11</div><div class="stat-lbl">Planets Mapped</div></div>
-      <div class="stat"><div class="stat-val" id="noteCount">0</div><div class="stat-lbl">Notes Generated</div></div>
-      <div class="stat"><div class="stat-val">2,048</div><div class="stat-lbl">Audio Samples Created</div></div>
-      <div class="stat"><div class="stat-val">14.7K</div><div class="stat-lbl">Data Points Processed</div></div>
-    </div>
-  </div>
-</section>
+<p>This project converts numerical properties of planets and moons — surface temperature, diameter, and orbital velocity — into audio signals. Originally prototyped for NASA Space Apps Challenge 2023 (Adelaide), where it was selected as a Galactic Problem Solver. Python + Streamlit for the reference implementation; this page implements the same formulas directly in the Web Audio API so you can hear each body in-browser.</p>
 
-<section id="sonify">
-  <div class="container">
-    <div class="label">Sonify</div>
-    <div class="title">Listen to the Solar System</div>
-    <p class="subtitle">Click a planet to hear its data transformed into sound. Temperature sets pitch, diameter sets duration, orbital velocity sets volume.</p>
-    <div class="planet-grid" id="planetGrid"></div>
-  </div>
-</section>
+<h2><span class="n">§1</span>Dataset &amp; Play-Back</h2>
+<div class="datatable">
+<table>
+<thead><tr><th>Body</th><th class="num">Diameter (km)</th><th class="num">Mass (10²⁴ kg)</th><th class="num">T_mean (K)</th><th class="num">V_orb (km/s)</th><th>Play</th></tr></thead>
+<tbody id="tbl"></tbody>
+</table>
+</div>
+<p style="font-size:12px;color:#7d8a99">Source: NASA planetary factsheet / JPL Horizons (public).</p>
 
-<section>
-  <div class="container">
-    <div class="label">Composer</div>
-    <div class="title">Adjust the Sound</div>
-    <div class="composer">
-      <div class="composer-row">
-        <div class="fg">
-          <label>Pitch Range (Hz)</label>
-          <input type="range" id="pitchRange" min="100" max="1200" value="600" oninput="this.nextElementSibling.textContent=this.value+'Hz'">
-          <span class="range-val">600Hz</span>
-        </div>
-        <div class="fg">
-          <label>Tempo (BPM)</label>
-          <input type="range" id="tempo" min="40" max="200" value="120" oninput="this.nextElementSibling.textContent=this.value+' BPM'">
-          <span class="range-val">120 BPM</span>
-        </div>
-        <div class="fg">
-          <label>Scale</label>
-          <select id="scaleSelect">
-            <option value="major">Major</option><option value="minor">Minor</option>
-            <option value="pentatonic" selected>Pentatonic</option><option value="chromatic">Chromatic</option>
-          </select>
-        </div>
-      </div>
-      <div style="margin-top:1.25rem"><button class="btn btn-primary btn-sm" onclick="resonifyActive()">Re-sonify Active Planet</button></div>
-    </div>
-  </div>
-</section>
+<h2><span class="n">§2</span>Sonification Mapping</h2>
+<p>Each body is rendered as a single sine-wave pitch with an ADSR envelope. Pitch scales with temperature, duration with diameter, and amplitude with orbital velocity.</p>
+<div class="formula">PITCH       <b>f</b>  = 220 &times; 2<sup>((T − 270) / 50)</sup>   Hz
 
-<section>
-  <div class="container">
-    <div class="label">Keyboard</div>
-    <div class="title">Piano Visualizer</div>
-    <div class="piano-wrap"><div class="piano" id="piano"></div></div>
-  </div>
-</section>
+DURATION    <b>d</b>  = 0.4 + 2.0 &times; log₁₀(D / 3000)  seconds
 
-<section id="scanner">
-  <div class="container">
-    <div class="label">Scanner</div>
-    <div class="title">Image Sonification</div>
-    <p class="subtitle">A gradient image is scanned cell-by-cell. Brightness maps to musical notes, played sequentially.</p>
-    <div class="scanner-area">
-      <div class="canvas-box">
-        <canvas id="scanCanvas" width="320" height="320"></canvas>
-        <div style="margin-top:1rem"><button class="btn btn-primary btn-sm" onclick="startScan()">Scan Image</button></div>
-      </div>
-      <div class="scan-info">
-        <h4 style="font-size:.875rem;margin-bottom:.75rem">Scan Log</h4>
-        <div class="scan-log" id="scanLog">Click "Scan Image" to begin analysis...</div>
-      </div>
-    </div>
-  </div>
-</section>
+AMPLITUDE   <b>a</b>  = 0.20 + 0.60 &times; (V / 50)
 
-<section>
-  <div class="container">
-    <div class="label">Stack</div>
-    <div class="title">Built With</div>
-    <div class="pills">
-      <span class="pill">Python</span><span class="pill">Streamlit</span><span class="pill">NumPy</span>
-      <span class="pill">PIL</span><span class="pill">Audio Synthesis</span><span class="pill">Web Audio API</span>
-    </div>
-  </div>
-</section>
+WAVEFORM     sin(2πft) &times; ADSR envelope
+             attack 0.02s &middot; decay 0.10s &middot; sustain 0.7 &middot; release 0.3s</div>
 
-<footer><div class="container">Built by Vikrant Sharma &middot; <a href="https://github.com/Vikrant892/nasa-space-challenge" target="_blank" rel="noopener">View on GitHub</a></div></footer>
+<h2><span class="n">§3</span>Image-to-Music Mapping</h2>
+<p>An image is divided into a grid; each cell's average luminance is mapped to the nearest note in a pentatonic scale (C, D, E, G, A). Playback proceeds left-to-right, top-to-bottom at a configurable tempo. Below: a 16×8 starfield rendered to canvas, sonified on demand.</p>
+<div class="scanwrap">
+<div class="scanner"><canvas id="cv" width="320" height="160"></canvas></div>
+<div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12.5px"><button class="pbtn" onclick="sonifyImage()">[ SONIFY IMAGE ]</button><button class="pbtn" onclick="drawStars()" style="border-color:#7d8a99;color:#7d8a99">[ regenerate ]</button><span style="color:#7d8a99">tempo <b id="bpmv" style="color:#cfd6e0">180</b> bpm &middot; scale C pentatonic</span></div>
+</div>
+<div class="log" id="slog">click <b style="color:#cfd6e0">SONIFY IMAGE</b> to begin.</div>
+
+<h2><span class="n">§4</span>Technical Specification</h2>
+<div class="spec">
+<span class="k">Runtime</span><span class="v">Python 3.11 + Streamlit 1.28</span>
+<span class="k">Audio (web demo)</span><span class="v">Web Audio API (in-browser preview)</span>
+<span class="k">Sample rate</span><span class="v">44100 Hz</span>
+<span class="k">Data source</span><span class="v">NASA planetary factsheet (public)</span>
+<span class="k">Scale system</span><span class="v">Pentatonic — C₄, D₄, E₄, G₄, A₄</span>
+<span class="k">Image processing</span><span class="v">Pillow (PIL) 8-bit luminance extraction</span>
+<span class="k">Output formats</span><span class="v">WAV (offline) &middot; AudioContext (web)</span>
+</div>
+
+<h2><span class="n">§5</span>Recognition</h2>
+<div class="award">2023 &middot; NASA Space Apps Challenge Adelaide &middot; Galactic Problem Solver</div>
+
+<footer>
+Source: <a href="https://github.com/Vikrant892/nasa-space-challenge">github.com/Vikrant892/nasa-space-challenge</a> &middot; MIT<br>
+V. Sharma &middot; Adelaide &middot; 2023
+</footer>
+</div>
 
 <script>
-const PLANETS = [
-  {name:'Mercury', temp:167, diam:4879, vel:47.4, colors:['#8c7a6b','#b0a090']},
-  {name:'Venus', temp:464, diam:12104, vel:35.0, colors:['#c4956a','#e8c87a']},
-  {name:'Earth', temp:15, diam:12756, vel:29.8, colors:['#2563eb','#22c55e']},
-  {name:'Mars', temp:-65, diam:6792, vel:24.1, colors:['#c0392b','#e67e22']},
-  {name:'Jupiter', temp:-110, diam:142984, vel:13.1, colors:['#c49a6c','#8B7355']},
-  {name:'Saturn', temp:-140, diam:120536, vel:9.7, colors:['#d4a96a','#c4956a']},
-  {name:'Uranus', temp:-195, diam:51118, vel:6.8, colors:['#5bc0be','#3a9ea5']},
-  {name:'Neptune', temp:-200, diam:49528, vel:5.4, colors:['#1e3a8a','#3b82f6']},
-  {name:'Moon', temp:-20, diam:3475, vel:1.0, colors:['#9ca3af','#d1d5db']},
-  {name:'Europa', temp:-160, diam:3122, vel:13.7, colors:['#a8a29e','#d6d3d1']},
-  {name:'Titan', temp:-179, diam:5150, vel:5.6, colors:['#b45309','#d97706']}
+const BODIES=[
+ ['Mercury',4879,0.330,440,47.9],
+ ['Venus',12104,4.87,737,35.0],
+ ['Earth',12756,5.97,288,29.8],
+ ['Mars',6792,0.642,210,24.1],
+ ['Jupiter',142984,1898,165,13.1],
+ ['Saturn',120536,568,134,9.7],
+ ['Uranus',51118,86.8,76,6.8],
+ ['Neptune',49528,102,72,5.4],
+ ['Moon',3475,0.073,220,1.0],
+ ['Europa',3122,0.048,102,13.7],
+ ['Titan',5149,0.135,94,5.6],
 ];
+const tbl=document.getElementById('tbl');
+BODIES.forEach((b,i)=>{tbl.innerHTML+='<tr><td>'+b[0]+'</td><td class="num">'+b[1].toLocaleString()+'</td><td class="num">'+b[2]+'</td><td class="num">'+b[3]+'</td><td class="num">'+b[4]+'</td><td><button class="pbtn" onclick="play('+i+')">▶</button></td></tr>'});
+let ac=null;function ctx(){return ac||(ac=new (window.AudioContext||window.webkitAudioContext)())}
+function envelope(g,a,d,s,r,dur){const now=ctx().currentTime;g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(1,now+a);g.gain.linearRampToValueAtTime(s,now+a+d);g.gain.setValueAtTime(s,now+dur-r);g.gain.linearRampToValueAtTime(0,now+dur)}
+function play(i){const b=BODIES[i];const f=220*Math.pow(2,(b[3]-270)/50);const d=0.4+2.0*Math.log10(b[1]/3000);const a=Math.min(0.9,0.2+0.6*(b[4]/50));const c=ctx();const osc=c.createOscillator(),g=c.createGain();osc.type='sine';osc.frequency.value=Math.max(40,Math.min(3000,f));const gg=c.createGain();gg.gain.value=a;osc.connect(g);g.connect(gg);gg.connect(c.destination);envelope(g,0.02,0.1,0.7,0.3,d);osc.start();osc.stop(c.currentTime+d)}
 
-let audioCtx = null;
-let notesPlayed = 0;
-let activePlanet = null;
-
-function getCtx() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return audioCtx;
-}
-
-/* Build planet grid */
-const grid = document.getElementById('planetGrid');
-PLANETS.forEach((p, i) => {
-  const card = document.createElement('div');
-  card.className = 'planet-card';
-  card.dataset.idx = i;
-  const scale = Math.max(40, Math.min(72, (p.diam / 142984) * 72));
-  card.innerHTML = `
-    <div class="play-hint"></div>
-    <div class="planet-orb" style="width:${scale}px;height:${scale}px;background:radial-gradient(circle at 35% 35%,${p.colors[1]},${p.colors[0]});box-shadow:0 0 20px ${p.colors[0]}44"></div>
-    <h3>${p.name}</h3>
-    <div class="planet-data">${p.temp > 0 ? '+' : ''}${p.temp}&deg;C &middot; ${p.diam.toLocaleString()} km<br>${p.vel} km/s</div>`;
-  card.addEventListener('click', () => sonifyPlanet(i));
-  grid.appendChild(card);
-});
-
-function mapRange(v, inMin, inMax, outMin, outMax) {
-  return outMin + ((v - inMin) / (inMax - inMin)) * (outMax - outMin);
-}
-
-function sonifyPlanet(idx) {
-  const p = PLANETS[idx];
-  activePlanet = idx;
-  document.querySelectorAll('.planet-card').forEach((c, i) => c.classList.toggle('active', i === idx));
-
-  const ctx = getCtx();
-  const maxPitch = parseInt(document.getElementById('pitchRange').value);
-  const freq = mapRange(p.temp, -200, 464, 80, maxPitch);
-  const dur = mapRange(p.diam, 3122, 142984, 0.3, 2.5);
-  const vol = mapRange(p.vel, 1, 47.4, 0.15, 0.7);
-
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(freq, ctx.currentTime);
-  gain.gain.setValueAtTime(0, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.05);
-  gain.gain.setValueAtTime(vol, ctx.currentTime + dur * 0.6);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + dur);
-
-  highlightKey(freq);
-  notesPlayed++;
-  document.getElementById('noteCount').textContent = notesPlayed.toLocaleString();
-}
-
-function resonifyActive() {
-  if (activePlanet !== null) sonifyPlanet(activePlanet);
-}
-
-/* Piano */
-const NOTES = ['C','D','E','F','G','A','B'];
-const BLACK = [1,1,0,1,1,1,0];
-const piano = document.getElementById('piano');
-const pianoKeys = [];
-let totalWhite = 0;
-for (let oct = 3; oct <= 5; oct++) {
-  NOTES.forEach((n, i) => {
-    const key = document.createElement('div');
-    key.className = 'white-key';
-    key.innerHTML = `<span>${n}${oct}</span>`;
-    const freq = 440 * Math.pow(2, ((oct - 4) * 12 + [0,2,4,5,7,9,11][i] - 9) / 12);
-    key.dataset.freq = freq;
-    piano.appendChild(key);
-    pianoKeys.push({el: key, freq, type: 'white'});
-    totalWhite++;
-    if (BLACK[i]) {
-      const bk = document.createElement('div');
-      bk.className = 'black-key';
-      bk.style.left = (totalWhite * 36 - 12) + 'px';
-      const bf = 440 * Math.pow(2, ((oct - 4) * 12 + [0,2,4,5,7,9,11][i] + 1 - 9) / 12);
-      bk.dataset.freq = bf;
-      piano.appendChild(bk);
-      pianoKeys.push({el: bk, freq: bf, type: 'black'});
-    }
-  });
-}
-piano.style.width = (totalWhite * 36) + 'px';
-
-function highlightKey(freq) {
-  let closest = pianoKeys[0];
-  pianoKeys.forEach(k => {
-    if (Math.abs(k.freq - freq) < Math.abs(closest.freq - freq)) closest = k;
-  });
-  closest.el.classList.add('active');
-  setTimeout(() => closest.el.classList.remove('active'), 400);
-}
-
-/* Scanner */
-const scanCanvas = document.getElementById('scanCanvas');
-const sctx = scanCanvas.getContext('2d');
-(function drawGradient() {
-  const grd1 = sctx.createLinearGradient(0, 0, 320, 320);
-  grd1.addColorStop(0, '#1e3a8a'); grd1.addColorStop(0.5, '#7c3aed'); grd1.addColorStop(1, '#f59e0b');
-  sctx.fillStyle = grd1; sctx.fillRect(0, 0, 320, 320);
-  const grd2 = sctx.createRadialGradient(160, 160, 20, 160, 160, 180);
-  grd2.addColorStop(0, 'rgba(255,255,255,0.4)'); grd2.addColorStop(1, 'rgba(0,0,0,0)');
-  sctx.fillStyle = grd2; sctx.fillRect(0, 0, 320, 320);
-})();
-
-const SCALE_NOTES = {
-  major: [0,2,4,5,7,9,11],
-  minor: [0,2,3,5,7,8,10],
-  pentatonic: [0,2,4,7,9],
-  chromatic: [0,1,2,3,4,5,6,7,8,9,10,11]
-};
-
-function startScan() {
-  const ctx = getCtx();
-  const log = document.getElementById('scanLog');
-  log.innerHTML = '';
-  const imgData = sctx.getImageData(0, 0, 320, 320);
-  const gridSize = 8;
-  const cellW = 320 / gridSize;
-  const cells = [];
-  for (let r = 0; r < gridSize; r++) {
-    for (let c = 0; c < gridSize; c++) {
-      const px = Math.floor(c * cellW + cellW / 2);
-      const py = Math.floor(r * cellW + cellW / 2);
-      const idx = (py * 320 + px) * 4;
-      const brightness = (imgData.data[idx] + imgData.data[idx+1] + imgData.data[idx+2]) / 3 / 255;
-      cells.push(brightness);
-    }
-  }
-
-  const scale = SCALE_NOTES[document.getElementById('scaleSelect').value];
-  const bpm = parseInt(document.getElementById('tempo').value);
-  const interval = 60 / bpm / 2;
-
-  cells.forEach((b, i) => {
-    const noteIdx = Math.floor(b * (scale.length * 2));
-    const octave = 3 + Math.floor(noteIdx / scale.length);
-    const semitone = scale[noteIdx % scale.length];
-    const freq = 440 * Math.pow(2, ((octave - 4) * 12 + semitone - 9) / 12);
-    const t = ctx.currentTime + i * interval;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(freq, t);
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(0.25, t + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + interval * 0.9);
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start(t); osc.stop(t + interval);
-
-    setTimeout(() => {
-      highlightKey(freq);
-      const row = Math.floor(i / gridSize);
-      const col = i % gridSize;
-      log.innerHTML += `<div class="note-line">Cell [${row},${col}] brightness: ${(b*100).toFixed(0)}% -> ${freq.toFixed(0)}Hz</div>`;
-      log.scrollTop = log.scrollHeight;
-      notesPlayed++;
-      document.getElementById('noteCount').textContent = notesPlayed.toLocaleString();
-    }, (i * interval) * 1000);
-  });
+const cv=document.getElementById('cv'),g=cv.getContext('2d');
+function drawStars(){g.fillStyle='#0c1020';g.fillRect(0,0,320,160);for(let i=0;i<120;i++){const x=Math.random()*320,y=Math.random()*160,r=Math.random()*1.4+0.3,l=Math.floor(120+Math.random()*135);g.fillStyle='rgb('+l+','+l+','+l+')';g.beginPath();g.arc(x,y,r,0,Math.PI*2);g.fill()}const GW=16,GH=8,CW=320/GW,CH=160/GH;g.strokeStyle='rgba(125,138,153,0.15)';for(let i=1;i<GW;i++){g.beginPath();g.moveTo(i*CW,0);g.lineTo(i*CW,160);g.stroke()}for(let j=1;j<GH;j++){g.beginPath();g.moveTo(0,j*CH);g.lineTo(320,j*CH);g.stroke()}}
+drawStars();
+async function sonifyImage(){const c=ctx();const GW=16,GH=8,CW=320/GW,CH=160/GH;const notes=[261.63,293.66,329.63,392.00,440.00];const log=document.getElementById('slog');log.innerHTML='';
+ for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){
+  const px=g.getImageData(i*CW+CW/2,j*CH+CH/2,Math.ceil(CW),Math.ceil(CH)).data;let lum=0;for(let k=0;k<px.length;k+=4)lum+=0.299*px[k]+0.587*px[k+1]+0.114*px[k+2];lum/=(px.length/4);const n=Math.min(4,Math.floor(lum/255*4.999));const f=notes[n]*(j<4?2:1);
+  const osc=c.createOscillator(),gn=c.createGain();osc.type='sine';osc.frequency.value=f;gn.gain.value=0.0001;const now=c.currentTime;gn.gain.linearRampToValueAtTime(0.12,now+0.005);gn.gain.linearRampToValueAtTime(0,now+0.12);osc.connect(gn);gn.connect(c.destination);osc.start();osc.stop(now+0.13);
+  // outline the current cell
+  g.strokeStyle='#5da9e0';g.lineWidth=1.5;g.strokeRect(i*CW,j*CH,CW,CH);
+  log.innerHTML+='<div class="hit">[cell '+i+','+j+']  L='+(lum/255).toFixed(2)+'  →  f='+f.toFixed(0)+' Hz</div>';log.scrollTop=log.scrollHeight;
+  await new Promise(r=>setTimeout(r,60));
+  // redraw cell plain
+  g.clearRect(i*CW,j*CH,CW,CH);const pxd=g.createImageData(CW,CH);drawStars();
+ }
+ log.innerHTML+='<div style="color:#7bb274">scan complete.</div>';
 }
 </script>
 </body>
