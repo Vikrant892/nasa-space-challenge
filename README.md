@@ -1,6 +1,6 @@
-# Cosmic Keys - Planetary Data Sonification
+# Cosmic Keys, Planetary Data Sonification
 
-> NASA Space Apps Challenge 2024 - Global Winner
+> NASA Space Apps Challenge 2023, Global Finalist with Team Eklavya
 
 Turn planetary data into piano music. Scan images of planets and moons, and hear them played as piano tones.
 
