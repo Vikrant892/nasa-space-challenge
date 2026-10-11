@@ -45,7 +45,7 @@ Then open http://localhost:8501
 
 ## The team
 
-Built in 48 hours at NASA Space Apps Challenge 2024. We wanted to make space data accessible in a completely new way - through sound.
+Created by Team Eklavya for NASA Space Apps Challenge 2023, where the team reached Global Finalist. The project makes planetary data accessible through sound.
 
 The idea came from wondering what Jupiter would sound like if you could "play" its orbital data on a piano. Turns out, the gas giants sound surprisingly mellow.
 
